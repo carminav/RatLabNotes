@@ -79,7 +79,7 @@ public class Program {
         
         System.out.println("videoPanel: " + videoSurface.WIDTH + " x " + videoSurface.HEIGHT);
         System.out.println("optionsPanel: " + optionsPanel.WIDTH + " x " + optionsPanel.HEIGHT);
-        // HELLOW
+        
         
         leftPanel.add(videoSurface);
         leftPanel.add(optionsPanel);
