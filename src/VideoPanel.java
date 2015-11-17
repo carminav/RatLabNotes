@@ -19,29 +19,26 @@ import uk.co.caprica.vlcj.player.direct.format.RV32BufferFormat;
 public class VideoPanel extends JPanel {
 	
 	final private BufferedImage image;
-	final private int width;
-	final private int height;
+	final private Dimension videoSize;
 	final private DirectMediaPlayerComponent mediaPlayerComponent;
 	private DirectMediaPlayer mediaPlayer;
 
-	public VideoPanel(int width, int height) {
+	public VideoPanel(Dimension panelSize, Dimension videoSize) {
         setBackground(Color.black);
         setOpaque(true);
-        setPreferredSize(new Dimension(width, height));
-        setMinimumSize(new Dimension(width, height));
-        setMaximumSize(new Dimension(width, height));
-        this.width = width;
-        this.height = height;
+        setSize(panelSize);
+        this.videoSize = videoSize;
+
         image = GraphicsEnvironment
                 .getLocalGraphicsEnvironment()
                 .getDefaultScreenDevice()
                 .getDefaultConfiguration()
-                .createCompatibleImage(width, height);
+                .createCompatibleImage(videoSize.width, videoSize.height);
         
         BufferFormatCallback bufferFormatCallback = new BufferFormatCallback() {
             @Override
             public BufferFormat getBufferFormat(int sourceWidth, int sourceHeight) {
-                return new RV32BufferFormat(width, height);
+                return new RV32BufferFormat(videoSize.width, videoSize.height);
             }
         };
         
@@ -71,13 +68,12 @@ public class VideoPanel extends JPanel {
 
     private class RCAdapter extends RenderCallbackAdapter {
         private RCAdapter() {
-            super(new int[width * height]);
+            super(new int[videoSize.width * videoSize.height]);
         }
 
         @Override
         protected void onDisplay(DirectMediaPlayer mediaPlayer, int[] rgbBuffer) {
-            // copy buffer to the image and repaint
-            image.setRGB(0, 0, width, height, rgbBuffer, 0, width);
+            image.setRGB(0, 0, videoSize.width, videoSize.height, rgbBuffer, 0, videoSize.width);
             repaint();
         }
     }

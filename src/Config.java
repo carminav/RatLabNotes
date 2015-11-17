@@ -24,4 +24,9 @@ public class Config {
 	public Dimension getLiveFeedSize() {
 		return new Dimension((int) (width * LIVE_FEED_PANEL_WIDTH_RATIO), height);
 	}
+	
+	public Dimension getVideoSize() {
+		return new Dimension((int) (width * VIDEO_PANEL_WIDTH_RATIO), 
+							(int) (height * VIDEO_PANEL_WIDTH_RATIO));
+	}
 }
