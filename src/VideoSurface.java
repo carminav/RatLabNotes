@@ -16,17 +16,17 @@ import uk.co.caprica.vlcj.player.direct.RenderCallbackAdapter;
 import uk.co.caprica.vlcj.player.direct.format.RV32BufferFormat;
 
 
-public class VideoPanel extends JPanel {
+public class VideoSurface extends JPanel {
 	
 	final private BufferedImage image;
 	final private Dimension videoSize;
 	final private DirectMediaPlayerComponent mediaPlayerComponent;
 	private DirectMediaPlayer mediaPlayer;
 
-	public VideoPanel(Dimension panelSize, Dimension videoSize) {
+	public VideoSurface(Dimension videoSize) {
         setBackground(Color.black);
         setOpaque(true);
-        setSize(panelSize);
+        setSize(videoSize);
         this.videoSize = videoSize;
 
         image = GraphicsEnvironment

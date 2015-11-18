@@ -1,10 +1,12 @@
+import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
@@ -15,10 +17,11 @@ public class Program {
 
     private final Config config;
     private final JFrame frame;
-    private final VideoPanel videoPanel;
+    private final VideoSurface videoSurface;
     private final LiveFeedPanel liveFeedPanel;
     private final DirectMediaPlayerComponent mediaPlayerComponent;
     private DirectMediaPlayer mediaPlayer;
+    private final JPanel leftPanel;
 
     /* Initialize window with video and live feed components */
     public Program(String[] args) {
@@ -38,16 +41,33 @@ public class Program {
             }
         });
         
-        videoPanel = new VideoPanel(config.getVideoPanelSize(), config.getVideoSize());
+        leftPanel = new JPanel();
+        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+        leftPanel.setSize(config.getVideoPanelSize());
+        
+        videoSurface = new VideoSurface(config.getVideoSize());
         liveFeedPanel = new LiveFeedPanel(config.getLiveFeedSize());
 
-        frame.add(videoPanel);
+        JPanel controlsPanel = new JPanel();
+
+        controlsPanel.setPreferredSize(new Dimension(config.getVideoPanelSize().width, 
+        								(int) (config.getVideoSize().height * 0.15)));
+        controlsPanel.setSize(new Dimension(config.getVideoPanelSize().width, 
+        								(int) (config.getVideoSize().height * 0.15)));
+        controlsPanel.setMaximumSize(new Dimension(config.getVideoPanelSize().width, 
+				(int) (config.getVideoSize().height * 0.15)));
+        controlsPanel.setBackground(Color.red);
+        
+        leftPanel.add(videoSurface);
+        leftPanel.add(controlsPanel);
+        
+        frame.add(leftPanel);
         frame.add(liveFeedPanel);
         frame.setVisible(true);
         
         /* play media */
-        mediaPlayer = videoPanel.getMediaPlayer();
-        mediaPlayerComponent = videoPanel.getMediaPlayerComponent();
+        mediaPlayer = videoSurface.getMediaPlayer();
+        mediaPlayerComponent = videoSurface.getMediaPlayerComponent();
         mediaPlayer.playMedia(args[0]);
     }
     
