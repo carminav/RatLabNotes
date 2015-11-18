@@ -6,6 +6,9 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -22,6 +25,8 @@ public class Program {
     private final DirectMediaPlayerComponent mediaPlayerComponent;
     private DirectMediaPlayer mediaPlayer;
     private final JPanel leftPanel;
+    
+    private String mediaPath = null;
 
     /* Initialize window with video and live feed components */
     public Program(String[] args) {
@@ -49,17 +54,19 @@ public class Program {
         liveFeedPanel = new LiveFeedPanel(config.getLiveFeedSize());
 
         JPanel controlsPanel = new JPanel();
-
-        controlsPanel.setPreferredSize(new Dimension(config.getVideoPanelSize().width, 
-        								(int) (config.getVideoSize().height * 0.15)));
         controlsPanel.setSize(new Dimension(config.getVideoPanelSize().width, 
         								(int) (config.getVideoSize().height * 0.15)));
         controlsPanel.setMaximumSize(new Dimension(config.getVideoPanelSize().width, 
 				(int) (config.getVideoSize().height * 0.15)));
+        controlsPanel.setPreferredSize(new Dimension(config.getVideoPanelSize().width, 
+				(int) (config.getVideoSize().height * 0.15)));
+        
         controlsPanel.setBackground(Color.red);
         
         leftPanel.add(videoSurface);
         leftPanel.add(controlsPanel);
+        
+        setupMenu();
         
         frame.add(leftPanel);
         frame.add(liveFeedPanel);
@@ -69,6 +76,26 @@ public class Program {
         mediaPlayer = videoSurface.getMediaPlayer();
         mediaPlayerComponent = videoSurface.getMediaPlayerComponent();
         mediaPlayer.playMedia(args[0]);
+    }
+    
+    private void setupMenu() {
+    	JMenuBar menuBar = new JMenuBar();
+    	JMenu fileMenu = new JMenu("File");
+    	
+    	JMenuItem newI, openI, saveI, configI;
+    	
+    	newI = new JMenuItem("New");
+    	openI = new JMenuItem("Open");
+    	saveI = new JMenuItem("Save");
+    	configI = new JMenuItem("Configure");
+    	
+    	fileMenu.add(newI);
+    	fileMenu.add(openI);
+    	fileMenu.add(saveI);
+    	fileMenu.add(configI);
+    	menuBar.add(fileMenu);
+    	
+    	frame.setJMenuBar(menuBar);
     }
     
     public static void main(final String[] args) {
