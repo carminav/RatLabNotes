@@ -1,10 +1,15 @@
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -63,6 +68,17 @@ public class Program {
         
         controlsPanel.setBackground(Color.red);
         
+        JButton pause = new JButton("Pause");
+        pause.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				mediaPlayerComponent.getMediaPlayer().pause();
+				
+			}
+        });
+        controlsPanel.add(pause);
+        
+        
         leftPanel.add(videoSurface);
         leftPanel.add(controlsPanel);
         
@@ -75,7 +91,7 @@ public class Program {
         /* play media */
         mediaPlayer = videoSurface.getMediaPlayer();
         mediaPlayerComponent = videoSurface.getMediaPlayerComponent();
-        mediaPlayer.playMedia(args[0]);
+        //mediaPlayer.playMedia(args[0]);
     }
     
     private void setupMenu() {
@@ -89,6 +105,8 @@ public class Program {
     	saveI = new JMenuItem("Save");
     	configI = new JMenuItem("Configure");
     	
+    	newI.addActionListener(new MenuListener());
+    	
     	fileMenu.add(newI);
     	fileMenu.add(openI);
     	fileMenu.add(saveI);
@@ -98,6 +116,7 @@ public class Program {
     	frame.setJMenuBar(menuBar);
     }
     
+    
     public static void main(final String[] args) {
         new NativeDiscovery().discover();
         SwingUtilities.invokeLater(new Runnable() {
@@ -106,6 +125,25 @@ public class Program {
                 new Program(args);
             }
         });
+    }
+    
+    class MenuListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JFileChooser fileChooser = new JFileChooser();
+	    	fileChooser.setCurrentDirectory(new File("C:\\Users\\Carmina\\Videos"));
+	    	int result = fileChooser.showOpenDialog(frame);
+	    	if (result == JFileChooser.APPROVE_OPTION) {
+	    	    File selectedFile = fileChooser.getSelectedFile();
+	    	    mediaPath = selectedFile.getAbsolutePath();
+	    	}
+	    	
+	    	
+	    	mediaPlayer.playMedia(mediaPath);
+	    	
+		}
+    	
     }
     
 }
