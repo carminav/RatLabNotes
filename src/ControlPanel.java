@@ -1,20 +1,26 @@
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Hashtable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
+import uk.co.caprica.vlcj.player.MediaPlayer;
 
 public class ControlPanel extends JPanel {
 	
@@ -29,17 +35,21 @@ public class ControlPanel extends JPanel {
 	
 	private JSlider timeline;
 	private JSlider speed;
+	private JProgressBar progressBar;
 	
 	private JPanel topPanel;
 	private JPanel middlePanel;
 	private JPanel bottomPanel;
 	
-	private JLabel timePassedText;
-	private JLabel timeLeftText;
+	private JLabel videoTime;
 	
 	private Dimension size;
 	
+	private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+	
 	private DirectMediaPlayerComponent mediaPlayerComponent;
+	private boolean setPositionValue;
+	
 	
 	public ControlPanel(DirectMediaPlayerComponent mpc, Dimension size) {
 		this.size = size;
@@ -56,40 +66,45 @@ public class ControlPanel extends JPanel {
 		addMiddlePanel();
 		addBottomPanel();
 		
+		executorService.scheduleAtFixedRate(new UpdateRunnable(mpc.getMediaPlayer()), 0L, 1L, TimeUnit.SECONDS);
+		
 	}
 	
 	private void addTopPanel() {
 		topPanel = new JPanel();
 		topPanel.setBackground(Color.green);
 		
-		// add temporary time passed timestamp
-		timePassedText = new JLabel("15:03");
-		timePassedText.setFont(new Font("Courier New", Font.BOLD, 30));
-		topPanel.add(timePassedText);
-			
-		// add JSlider
-		timeline = new JSlider(0, 100, 0);
-	 	timeline.setPreferredSize(new Dimension((int) (size.width * 0.85), size.height / 5));
-	 	timeline.setMajorTickSpacing(10);
-        timeline.setMajorTickSpacing(5);
-        timeline.setPaintTicks(true);
-        timeline.addChangeListener(new ChangeListener() {
-        	public void stateChanged(ChangeEvent e) {
-        			mediaPlayerComponent.getMediaPlayer().setPosition(
-        							(float)timeline.getValue() / 100.0f);                  
-        	}
-        });
-
+		videoTime = new JLabel("hh:mm:ss");
 		
-		topPanel.add(timeline);
+		timeline = new JSlider(0,100,0);
+		timeline.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if(!setPositionValue) {
+					float positionValue = (float)timeline.getValue() / 100.0f;
+					mediaPlayerComponent.getMediaPlayer().setPosition(positionValue);
+				}
+			}
+		});
 		
-		//add temporary time left timestamp
-		timeLeftText = new JLabel("02:03");
-		timeLeftText.setFont(new Font("Courier New", Font.BOLD, 30));
-		topPanel.add(timeLeftText);
 		
-		add(topPanel);
+		progressBar = new JProgressBar();
+		progressBar.setMinimum(0);
+		progressBar.setMaximum(100);
+		progressBar.setValue(0);
 		
+		JPanel positionPanel = new JPanel();
+	    positionPanel.setLayout(new GridLayout(2, 1));
+	    positionPanel.add(progressBar);
+	    positionPanel.add(timeline);
+	    
+	    topPanel.setLayout(new BorderLayout(8, 0));
+	    
+	    topPanel.add(videoTime, BorderLayout.WEST);
+	    topPanel.add(positionPanel, BorderLayout.CENTER);
+	    
+	    add(topPanel);
+	    
 	}
 	
 	private void addMiddlePanel() {
@@ -138,6 +153,24 @@ public class ControlPanel extends JPanel {
 		bottomPanel.add(speed);
 		bottomPanel.add(saveBtn);
 		add(bottomPanel);
+	}
+	
+	private void updatePosition(int value) {
+		progressBar.setValue(value);
+
+		// Set the guard to stop the update from firing a change event
+		setPositionValue = true;
+		timeline.setValue(value);
+		setPositionValue = false;
+	}
+	
+	private void updateTime(long millis) {
+		String s = String.format("%02d:%02d:%02d",
+				TimeUnit.MILLISECONDS.toHours(millis),
+				TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)), 
+				TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis))
+				);
+		videoTime.setText(s);
 	}
 	
 	private void addButtons() {
@@ -195,5 +228,32 @@ public class ControlPanel extends JPanel {
 	public void keyPressDone() {
 		
 	}
+	
+	private final class UpdateRunnable implements Runnable {
+
+	    private final MediaPlayer mediaPlayer;
+	    
+	    private UpdateRunnable(MediaPlayer mediaPlayer) {
+	      this.mediaPlayer = mediaPlayer;
+	    }
+	    
+	    @Override
+	    public void run() {
+	      final long time = mediaPlayer.getTime();
+	      
+	      final long duration = mediaPlayer.getLength();
+	      final int position = duration > 0 ? (int)Math.round(100.0 * (double)time / (double)duration) : 0;
+	      
+	      // Updates to user interface components must be executed on the Event
+	      // Dispatch Thread
+	      SwingUtilities.invokeLater(new Runnable() {
+	        @Override
+	        public void run() {
+	          updateTime(time);
+	          updatePosition(position);
+	        }
+	      });
+	    }
+	  }
 
 }
