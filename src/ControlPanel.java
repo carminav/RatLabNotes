@@ -73,7 +73,13 @@ public class ControlPanel extends JPanel {
 	 	timeline.setMajorTickSpacing(10);
         timeline.setMajorTickSpacing(5);
         timeline.setPaintTicks(true);
-        
+        timeline.addChangeListener(new ChangeListener() {
+        	public void stateChanged(ChangeEvent e) {
+        			mediaPlayerComponent.getMediaPlayer().setPosition(
+        							(float)timeline.getValue() / 100.0f);                  
+        	}
+        });
+
 		
 		topPanel.add(timeline);
 		
