@@ -38,7 +38,7 @@ public class Program {
     public Program(String[] args) {
 
     	config = new Config(Toolkit.getDefaultToolkit().getScreenSize().width,
-    				Toolkit.getDefaultToolkit().getScreenSize().height);
+    				 (int) (0.95 * Toolkit.getDefaultToolkit().getScreenSize().height));
     	
         frame = new JFrame("Rat Lab Notes");
         frame.setSize(config.getWindowSize());
@@ -58,8 +58,12 @@ public class Program {
         
         videoSurface = new VideoSurface(config.getVideoSize());
         liveFeedPanel = new LiveFeedPanel(config.getLiveFeedSize());
+           
+        /* play media */
+        mediaPlayer = videoSurface.getMediaPlayer();
+        mediaPlayerComponent = videoSurface.getMediaPlayerComponent();
         
-        controlPanel = new ControlPanel(config.getControlPanelSize());
+        controlPanel = new ControlPanel(mediaPlayerComponent, config.getControlPanelSize());
         
         leftPanel.add(videoSurface);
         leftPanel.add(controlPanel);
@@ -69,13 +73,9 @@ public class Program {
         frame.add(leftPanel);
         frame.add(liveFeedPanel);
         frame.setVisible(true);
-        
-        /* play media */
-        mediaPlayer = videoSurface.getMediaPlayer();
-        mediaPlayerComponent = videoSurface.getMediaPlayerComponent();
-        //mediaPlayer.playMedia(args[0]);
     }
     
+    /* setup header menu items */
     private void setupMenu() {
     	JMenuBar menuBar = new JMenuBar();
     	JMenu fileMenu = new JMenu("File");
@@ -105,6 +105,7 @@ public class Program {
             @Override
             public void run() {
                 new Program(args);
+                
             }
         });
     }
@@ -121,8 +122,12 @@ public class Program {
 	    	    mediaPath = selectedFile.getAbsolutePath();
 	    	}
 	    	
-	    	
 	    	mediaPlayer.playMedia(mediaPath);
+	    	
+	    	frame.setTitle(String.format(
+	                "Rat Lab Notes - %s",
+	                mediaPlayerComponent.getMediaPlayer().getMediaMeta().getTitle()
+	        ));
 	    	
 		}
     	
