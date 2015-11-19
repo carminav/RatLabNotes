@@ -1,13 +1,18 @@
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Hashtable;
 
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.JTextArea;
+import javax.swing.JToggleButton;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
 
@@ -16,10 +21,10 @@ public class ControlPanel extends JPanel {
 	private static final int ROWS = 1;
 	private static final int COLS = 4;
 	
-	private JButton pausePlayBtn;
+	private JToggleButton pausePlayBtn;
 	private JButton rewindBtn;
 	private JButton forwardBtn;
-	private JButton muteBtn;
+	private JToggleButton muteBtn;
 	private JButton saveBtn;
 	
 	private JSlider timeline;
@@ -29,8 +34,8 @@ public class ControlPanel extends JPanel {
 	private JPanel middlePanel;
 	private JPanel bottomPanel;
 	
-	private JTextArea timePassedText;
-	private JTextArea timeLeftText;
+	private JLabel timePassedText;
+	private JLabel timeLeftText;
 	
 	private Dimension size;
 	
@@ -47,7 +52,6 @@ public class ControlPanel extends JPanel {
 		setLayout(new GridLayout(5, 1));
 		mediaPlayerComponent = mpc;
 		
-		
 		addTopPanel();
 		addMiddlePanel();
 		addBottomPanel();
@@ -59,19 +63,23 @@ public class ControlPanel extends JPanel {
 		topPanel.setBackground(Color.green);
 		
 		// add temporary time passed timestamp
-		timePassedText = new JTextArea("15:03");
-		timePassedText.setSize((int) (size.width * 0.10), size.height  / 5);
+		timePassedText = new JLabel("15:03");
+		timePassedText.setFont(new Font("Courier New", Font.BOLD, 30));
 		topPanel.add(timePassedText);
 			
 		// add JSlider
 		timeline = new JSlider(0, 100, 0);
-	 	timeline.setPreferredSize(new Dimension((int) (size.width * 0.8), size.height / 5));
+	 	timeline.setPreferredSize(new Dimension((int) (size.width * 0.85), size.height / 5));
+	 	timeline.setMajorTickSpacing(10);
+        timeline.setMajorTickSpacing(5);
+        timeline.setPaintTicks(true);
+        
 		
 		topPanel.add(timeline);
 		
 		//add temporary time left timestamp
-		timeLeftText = new JTextArea("02:03");
-		timeLeftText.setSize((int) (size.width * 0.10), size.height / 5);
+		timeLeftText = new JLabel("02:03");
+		timeLeftText.setFont(new Font("Courier New", Font.BOLD, 30));
 		topPanel.add(timeLeftText);
 		
 		add(topPanel);
@@ -91,8 +99,32 @@ public class ControlPanel extends JPanel {
 	private void addBottomPanel() {
 		bottomPanel = new JPanel();
 		
-		speed = new JSlider(0, 100, 0);
+		speed = new JSlider(-200, 200, 0);
 		speed.setPreferredSize(new Dimension((int) (size.width * 0.7), size.height / 5));
+		speed.setMajorTickSpacing(100);
+        speed.setPaintTicks(true);
+		Hashtable<Integer, JLabel> labelTable = new Hashtable ();
+        labelTable.put( new Integer( 0 ), new JLabel("1x") );
+        labelTable.put( new Integer( -200 ), new JLabel("-2x") );
+        labelTable.put( new Integer( 200 ), new JLabel("2x") );
+        speed.setLabelTable( labelTable );
+        speed.setPaintLabels(true);
+
+        speed.addChangeListener(new ChangeListener() {
+
+        	public void stateChanged(ChangeEvent arg0) {
+        		if(!speed.getValueIsAdjusting() && 
+        				(mediaPlayerComponent.getMediaPlayer().isPlaying()))
+        		{
+        			int perc = speed.getValue();
+        			float ratio= (float) (perc/400f*1.75);
+        			ratio = ratio + (9/8);
+        			mediaPlayerComponent.getMediaPlayer().setRate(ratio);
+        		}
+
+        	}
+        	
+        });
 		
 		saveBtn = new JButton("Save");
 		saveBtn.setPreferredSize(new Dimension((int) (size.width * 0.1), size.height / 5));
@@ -104,7 +136,7 @@ public class ControlPanel extends JPanel {
 	
 	private void addButtons() {
 		
-		pausePlayBtn = new JButton("Play");
+		pausePlayBtn = new JToggleButton("Play");
 		pausePlayBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -128,7 +160,7 @@ public class ControlPanel extends JPanel {
 			}
 		});
 		
-		muteBtn = new JButton("Mute");
+		muteBtn = new JToggleButton("mute");
 		muteBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
