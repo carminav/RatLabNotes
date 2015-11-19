@@ -29,4 +29,9 @@ public class Config {
 		return new Dimension((int) (width * VIDEO_PANEL_WIDTH_RATIO), 
 							(int) (height * VIDEO_PANEL_WIDTH_RATIO));
 	}
+	
+	public Dimension getControlPanelSize() {
+		return new Dimension ((int) (width * VIDEO_PANEL_WIDTH_RATIO), 
+								(int) (height * (1 - VIDEO_PANEL_WIDTH_RATIO)));
+	}
 }

@@ -30,6 +30,7 @@ public class Program {
     private final DirectMediaPlayerComponent mediaPlayerComponent;
     private DirectMediaPlayer mediaPlayer;
     private final JPanel leftPanel;
+    private ControlPanel controlPanel;
     
     private String mediaPath = null;
 
@@ -57,30 +58,11 @@ public class Program {
         
         videoSurface = new VideoSurface(config.getVideoSize());
         liveFeedPanel = new LiveFeedPanel(config.getLiveFeedSize());
-
-        JPanel controlsPanel = new JPanel();
-        controlsPanel.setSize(new Dimension(config.getVideoPanelSize().width, 
-        								(int) (config.getVideoSize().height * 0.15)));
-        controlsPanel.setMaximumSize(new Dimension(config.getVideoPanelSize().width, 
-				(int) (config.getVideoSize().height * 0.15)));
-        controlsPanel.setPreferredSize(new Dimension(config.getVideoPanelSize().width, 
-				(int) (config.getVideoSize().height * 0.15)));
         
-        controlsPanel.setBackground(Color.red);
-        
-        JButton pause = new JButton("Pause");
-        pause.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				mediaPlayerComponent.getMediaPlayer().pause();
-				
-			}
-        });
-        controlsPanel.add(pause);
-        
+        controlPanel = new ControlPanel(config.getControlPanelSize());
         
         leftPanel.add(videoSurface);
-        leftPanel.add(controlsPanel);
+        leftPanel.add(controlPanel);
         
         setupMenu();
         

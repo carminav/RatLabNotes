@@ -6,10 +6,9 @@ import javax.swing.JPanel;
 
 public class LiveFeedPanel extends JPanel {
 	
-	public LiveFeedPanel(Dimension dim) {
+	public LiveFeedPanel(Dimension size) {
 		setBackground(Color.white);
-		setSize(dim);
-		System.out.println("live feed panel: " + dim.width + " x " + dim.height);
+		setSize(size);
 	}
 	
 }
