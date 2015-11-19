@@ -16,6 +16,7 @@ public class ConfigDialog extends JDialog {
 	private JPanel mainPane;
 	private JPanel keyInputPanel;
 	private JButton addRowBtn;
+	private JButton applyBtn;
 	
 	
 	private final int INIT_ROWS = 3;
@@ -24,7 +25,7 @@ public class ConfigDialog extends JDialog {
 	public ConfigDialog(JFrame parent) {
 		super(parent, "Configure Hotkeys");
 		setLocation(500,500);
-		setSize(800, 600);
+	//	setSize(800, 600);
 		
 		mainPane = new JPanel();
 		mainPane.setBackground(Color.BLUE);
@@ -57,8 +58,23 @@ public class ConfigDialog extends JDialog {
 			}
 		});
 		
+		applyBtn = new JButton("Apply");
+		applyBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				
+			}
+		});
+		
+		JPanel btnPanel = new JPanel(new GridLayout(2,1));
+		btnPanel.add(addRowBtn);
+		btnPanel.add(applyBtn);
+		btnPanel.setAlignmentX(0);
+		
 		mainPane.add(keyInputPanel);
-		mainPane.add(addRowBtn);
+		mainPane.add(btnPanel);
+		
 		getContentPane().add(mainPane);
 		setVisible(true);
 	}
@@ -70,11 +86,8 @@ public class ConfigDialog extends JDialog {
 		JCheckBox hasDuration = new JCheckBox();
 		hasDuration.setHorizontalAlignment(JCheckBox.CENTER);
 		
-		
 		keyInputPanel.add(keyText);
 		keyInputPanel.add(descText);
 		keyInputPanel.add(hasDuration);
-		
-		
 	}
 }
