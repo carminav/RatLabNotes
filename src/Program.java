@@ -1,4 +1,3 @@
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -8,7 +7,6 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -31,6 +29,8 @@ public class Program {
     private DirectMediaPlayer mediaPlayer;
     private final JPanel leftPanel;
     private ControlPanel controlPanel;
+    
+    private ConfigDialog configPanel;
     
     private String mediaPath = null;
 
@@ -88,6 +88,13 @@ public class Program {
     	configI = new JMenuItem("Configure");
     	
     	newI.addActionListener(new MenuListener());
+    	configI.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				configPanel = new ConfigDialog(frame);
+				
+			}
+    	});
     	
     	fileMenu.add(newI);
     	fileMenu.add(openI);
