@@ -21,14 +21,17 @@ public class ConfigDialog extends JDialog {
 	
 	private final int INIT_ROWS = 3;
 	
+	private boolean updated;
+	
 	
 	public ConfigDialog(JFrame parent) {
 		super(parent, "Configure Hotkeys");
 		setLocation(500,500);
-	//	setSize(800, 600);
+		setSize(800, 600);
 		
 		mainPane = new JPanel();
-		mainPane.setBackground(Color.BLUE);
+		
+		updated = false;
 		
 		keyInputPanel = new JPanel(new GridLayout(0, 3, 5, 5));
 		JLabel keyLabel = new JLabel("Hot Key");

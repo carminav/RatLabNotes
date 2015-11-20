@@ -1,7 +1,10 @@
 import java.awt.Dimension;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -19,17 +22,17 @@ import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.player.direct.DirectMediaPlayer;
 
-public class Program {
+public class Program implements KeyEventDispatcher {
 
     private final Config config;
     private final JFrame frame;
     private final VideoSurface videoSurface;
     private final LiveFeedPanel liveFeedPanel;
-    private final DirectMediaPlayerComponent mediaPlayerComponent;
+    private static DirectMediaPlayerComponent mediaPlayerComponent;
     private DirectMediaPlayer mediaPlayer;
     private final JPanel leftPanel;
-    private ControlPanel controlPanel;
     
+    private ControlPanel controlPanel;
     private ConfigDialog configPanel;
     
     private String mediaPath = null;
@@ -64,6 +67,9 @@ public class Program {
         mediaPlayerComponent = videoSurface.getMediaPlayerComponent();
         
         controlPanel = new ControlPanel(mediaPlayerComponent, config.getControlPanelSize());
+        
+        KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        manager.addKeyEventDispatcher(this);
         
         leftPanel.add(videoSurface);
         leftPanel.add(controlPanel);
@@ -117,6 +123,23 @@ public class Program {
         });
     }
     
+	@Override
+	public boolean dispatchKeyEvent(KeyEvent e) {
+		
+		if (e.getID() == KeyEvent.KEY_PRESSED) {
+			if  (e.getKeyCode() == KeyEvent.VK_SPACE) {
+				controlPanel.keyPressPlayPause();
+			} else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+				controlPanel.keyPressRewind();
+			} else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+				controlPanel.keyPressForward();
+			}
+		}
+			
+		
+		return false;
+	}
+    
     class MenuListener implements ActionListener {
 
 		@Override
@@ -139,5 +162,7 @@ public class Program {
 		}
     	
     }
+
+
     
 }

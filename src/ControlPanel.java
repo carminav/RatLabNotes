@@ -50,6 +50,8 @@ public class ControlPanel extends JPanel {
 	private DirectMediaPlayerComponent mediaPlayerComponent;
 	private boolean setPositionValue;
 	
+	private boolean pausePlaySelected = false;
+	
 	
 	public ControlPanel(DirectMediaPlayerComponent mpc, Dimension size) {
 		this.size = size;
@@ -214,20 +216,17 @@ public class ControlPanel extends JPanel {
 	}
 	
 	public void keyPressPlayPause() {
-		
+		pausePlayBtn.doClick();
 	}
 	
 	public void keyPressRewind() {
-		
+		rewindBtn.doClick();
 	}
 	
 	public void keyPressForward() {
-		
+		forwardBtn.doClick();
 	}
 	
-	public void keyPressDone() {
-		
-	}
 	
 	private final class UpdateRunnable implements Runnable {
 
