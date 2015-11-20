@@ -8,6 +8,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.sql.Timestamp;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFileChooser;
@@ -82,7 +83,7 @@ public class Program implements KeyEventDispatcher {
         
         setupMenu();
         
-        configDialog = new ConfigDialog(frame);
+        configDialog = new ConfigDialog(frame, this);
         
         frame.add(leftPanel);
         frame.add(liveFeedPanel);
@@ -106,10 +107,6 @@ public class Program implements KeyEventDispatcher {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				configDialog.setVisible(true);
-				Behaviors b = configDialog.getBehaviorConfig();
-				if (b != null) {
-					behaviors = b;
-				}
 			}
     	});
     	
@@ -134,22 +131,49 @@ public class Program implements KeyEventDispatcher {
         });
     }
     
+    protected void updateBehaviors(Behaviors b) {
+    	behaviors = b;
+    	System.out.println("size of b: " + b.size());
+    	
+    }
+    
 	@Override
 	public boolean dispatchKeyEvent(KeyEvent e) {
 		
+		
 		if (e.getID() == KeyEvent.KEY_PRESSED) {
+			
+			// Built in video controls
 			if  (e.getKeyCode() == KeyEvent.VK_SPACE) {
 				controlPanel.keyPressPlayPause();
 			} else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
 				controlPanel.keyPressRewind();
 			} else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
 				controlPanel.keyPressForward();
+			} else {
+				processConfigKeys(e);
 			}
+			
+			
 		}
 			
-		
 		return false;
 	}
+	
+	private void processConfigKeys(KeyEvent e) {
+		if (e.getID() == KeyEvent.KEY_PRESSED && behaviors.hasBehavior(e.getKeyCode())) {
+			System.out.println("should printttt");
+			String desc = behaviors.getDescription(e.getKeyCode());
+			boolean hasDur = behaviors.getHasDuration(e.getKeyCode());
+			long start = mediaPlayerComponent.getMediaPlayer().getTime();
+			long end = mediaPlayerComponent.getMediaPlayer().getTime();
+			
+			liveFeedPanel.printLiveEvent(e.getKeyChar(), new Timestamp(start), 
+											new Timestamp(end), desc);
+		} else {
+			System.out.println("wtf");
+		}
+	} 
     
     class MenuListener implements ActionListener {
 
