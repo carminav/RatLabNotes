@@ -49,15 +49,13 @@ public class LiveFeedPanel extends JPanel {
 		add(durText);
 	}
 	
-	public void printLiveEvent(char key, Timestamp start, Timestamp end, String desc) {
-		
-		long dur = end.getTime() - start.getTime();
+	public void printLiveEvent(char key, String start, String end, String desc, String dur) {
 
 		keyText.append(String.format("(%s)\n", key));
 		startText.append(String.format("[%s]\n", start));
 		endText.append(String.format("[%s]\n", end));
 		descText.append(String.format("%s\n", desc));
-		durText.append(String.format("%s\n", new Timestamp(dur)));
+		durText.append(String.format("%s\n", dur));
 		
 	}
 	

@@ -8,7 +8,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFileChooser;
@@ -35,11 +37,15 @@ public class Program implements KeyEventDispatcher {
     
     private Behaviors behaviors;
     
+    private ArrayList<BehaviorEvent> events;
+    
     private ConfigDialog configDialog;
     
     private ControlPanel controlPanel;
     
     private boolean ignoreKeys;
+    
+    private HashMap<Integer, BehaviorEvent> openEvents;
     
     private String mediaPath = null;
 
@@ -62,6 +68,8 @@ public class Program implements KeyEventDispatcher {
         });
         
         ignoreKeys = true;
+        
+        openEvents = new HashMap<Integer, BehaviorEvent>();
         
         frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
         
@@ -94,6 +102,8 @@ public class Program implements KeyEventDispatcher {
         frame.setVisible(true);
         
         System.out.println("live feed size: " + liveFeedPanel.getWidth());
+        
+        events = new ArrayList<BehaviorEvent>();
     }
     
     /* setup header menu items */
@@ -174,14 +184,65 @@ public class Program implements KeyEventDispatcher {
 		if (e.getID() == KeyEvent.KEY_PRESSED && behaviors.hasBehavior(e.getKeyCode())) {
 			String desc = behaviors.getDescription(e.getKeyCode());
 			boolean hasDur = behaviors.getHasDuration(e.getKeyCode());
-			long start = mediaPlayerComponent.getMediaPlayer().getTime();
-			long end = mediaPlayerComponent.getMediaPlayer().getTime();
+			long vidTime = mediaPlayerComponent.getMediaPlayer().getTime();
 			
-			liveFeedPanel.printLiveEvent(e.getKeyChar(), new Timestamp(start), 
-											new Timestamp(end), desc);
+			// add to event
+			
+			// check if still open and then close
+			if (hasDur) {
+				// close event
+				if (openEvents.containsKey(e.getKeyCode())) {
+					BehaviorEvent b = openEvents.get(e.getKeyCode());
+					b.setEnd(vidTime);
+					openEvents.remove(e.getKeyCode());
+					events.add(b);
+					liveFeedPanel.printLiveEvent(e.getKeyChar(), time(b.start), time(b.end), desc, time(b.dur));
+				} else {
+					// open event (wait for ending key press)
+					BehaviorEvent b = new BehaviorEvent(e.getKeyChar(), desc);
+					b.setStart(vidTime);
+					openEvents.put(e.getKeyCode(), b);
+				}
+			} else {
+				BehaviorEvent b = new BehaviorEvent(e.getKeyChar(), desc);
+				b.setStart(vidTime);
+				b.setEnd(vidTime);
+				events.add(b);
+				liveFeedPanel.printLiveEvent(e.getKeyChar(), time(b.start), time(b.end), desc, time(b.dur));
+			}
+			
 		}
 	} 
+	
+	private String time(long millis) {
+		return String.format("%02d:%02d:%02d",
+				TimeUnit.MILLISECONDS.toHours(millis),
+				TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)), 
+				TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis))
+				);
+	}
     
+	class BehaviorEvent {
+		char key;
+		String description;
+		long start, end, dur;
+		boolean expectNext;
+		
+		public BehaviorEvent(char key, String description) {
+			this.key = key;
+			this.description = description;
+		}
+		
+		void setStart(long start) {
+			this.start = start;
+		}
+		
+		void setEnd(long end) {
+			this.end = end;
+			dur = end - start;
+		}
+	}
+	
     class MenuListener implements ActionListener {
 
 		@Override
