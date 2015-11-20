@@ -32,8 +32,10 @@ public class Program implements KeyEventDispatcher {
     private DirectMediaPlayer mediaPlayer;
     private final JPanel leftPanel;
     
+    private Behaviors behaviors;
+    
     private ControlPanel controlPanel;
-    private ConfigDialog configPanel;
+    
     
     private String mediaPath = null;
 
@@ -54,6 +56,8 @@ public class Program implements KeyEventDispatcher {
                 System.exit(0);
             }
         });
+        
+        behaviors = new Behaviors();
         
         leftPanel = new JPanel();
         leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
@@ -97,8 +101,11 @@ public class Program implements KeyEventDispatcher {
     	configI.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				configPanel = new ConfigDialog(frame);
-				
+				ConfigDialog configPanel = new ConfigDialog(frame);
+				Behaviors b = configPanel.getBehaviorConfig();
+				if (b != null) {
+					behaviors = b;
+				}
 			}
     	});
     	

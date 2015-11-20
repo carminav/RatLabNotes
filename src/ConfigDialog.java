@@ -1,7 +1,8 @@
-import java.awt.Color;
+import java.awt.AWTKeyStroke;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -17,6 +18,8 @@ public class ConfigDialog extends JDialog {
 	private JPanel keyInputPanel;
 	private JButton addRowBtn;
 	private JButton applyBtn;
+	
+	private ArrayList<ConfigRow> rows;
 	
 	
 	private final int INIT_ROWS = 3;
@@ -43,6 +46,8 @@ public class ConfigDialog extends JDialog {
 		JLabel durLabel = new JLabel("Has Duration");
 		durLabel.setHorizontalAlignment(JLabel.CENTER);
 		
+		rows = new ArrayList<ConfigRow>();
+		
 		keyInputPanel.add(keyLabel);
 		keyInputPanel.add(descLabel);
 		keyInputPanel.add(durLabel);
@@ -65,8 +70,7 @@ public class ConfigDialog extends JDialog {
 		applyBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
-				
+				updated = true;
 			}
 		});
 		
@@ -82,15 +86,53 @@ public class ConfigDialog extends JDialog {
 		setVisible(true);
 	}
 	
+	public Behaviors getBehaviorConfig() {
+		if (updated) {
+			
+			Behaviors b = new Behaviors();
+			
+			for (int i = 0; i < rows.size(); i++) {
+				ConfigRow row = rows.get(i);
+				String key = row.keyText.getText();
+				String desc = row.descText.getText();
+				boolean hasDur = row.hasDuration.isSelected();
+				
+				if (!key.isEmpty() && !desc.isEmpty()) {
+					int keyStroke = AWTKeyStroke.getAWTKeyStroke(key.charAt(0)).getKeyCode();
+					b.addBehavior(keyStroke, desc, hasDur);
+				}	
+			}
+			
+			return b;
+			
+		} else return null;
+	}
+	
 	private void addRow() {
 		
 		JTextArea keyText = new JTextArea(1, 3);
 		JTextArea descText = new JTextArea(1, 20);
-		JCheckBox hasDuration = new JCheckBox();
-		hasDuration.setHorizontalAlignment(JCheckBox.CENTER);
 		
+		JCheckBox hasDuration = new JCheckBox();
+		
+		hasDuration.setHorizontalAlignment(JCheckBox.CENTER);
 		keyInputPanel.add(keyText);
 		keyInputPanel.add(descText);
 		keyInputPanel.add(hasDuration);
+		
+		rows.add(new ConfigRow(keyText, descText, hasDuration));
+	}
+	
+	class ConfigRow {
+		
+		JTextArea keyText;
+		JTextArea descText;
+		JCheckBox hasDuration;
+		
+		public ConfigRow(JTextArea keyText, JTextArea descText, JCheckBox hasDuration) {
+			this.keyText = keyText;
+			this.descText = descText;
+			this.hasDuration = hasDuration;
+		}
 	}
 }
