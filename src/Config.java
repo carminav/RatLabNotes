@@ -14,6 +14,7 @@ public class Config {
 	}
 	
 	public Dimension getWindowSize() {
+		System.out.println(String.format("Window size: %d x %d", width, height));
 		return new Dimension(width, height);
 	}
 	
@@ -22,6 +23,8 @@ public class Config {
 	}
 	
 	public Dimension getLiveFeedSize() {
+		System.out.println(String.format("Live Feed Size: %d x %d", 
+				(int) (width * LIVE_FEED_PANEL_WIDTH_RATIO), height));
 		return new Dimension((int) (width * LIVE_FEED_PANEL_WIDTH_RATIO), height);
 	}
 	

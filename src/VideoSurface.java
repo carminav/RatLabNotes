@@ -27,6 +27,8 @@ public class VideoSurface extends JPanel {
         setBackground(Color.black);
         setOpaque(true);
         setSize(videoSize);
+        setPreferredSize(videoSize);
+        
         this.videoSize = videoSize;
 
         image = GraphicsEnvironment

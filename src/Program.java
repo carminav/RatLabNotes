@@ -63,6 +63,8 @@ public class Program implements KeyEventDispatcher {
         
         ignoreKeys = true;
         
+        frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
+        
         behaviors = new Behaviors();
         
         leftPanel = new JPanel();
@@ -90,6 +92,8 @@ public class Program implements KeyEventDispatcher {
         frame.add(leftPanel);
         frame.add(liveFeedPanel);
         frame.setVisible(true);
+        
+        System.out.println("live feed size: " + liveFeedPanel.getWidth());
     }
     
     /* setup header menu items */
