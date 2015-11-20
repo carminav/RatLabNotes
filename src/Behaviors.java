@@ -14,6 +14,22 @@ public class Behaviors {
 		behaviors.put(key, b);
 	}
 	
+	public String getDescription(int keyCode) {
+		return behaviors.get(keyCode).description;
+	}
+	
+	public boolean getHasDuration(int keyCode) {
+		return behaviors.get(keyCode).hasDuration;
+	}
+	
+	public boolean hasBehavior(int keyCode) {
+		return behaviors.containsKey(keyCode);
+	}
+	
+	public int size() {
+		return behaviors.size();
+	}
+	
 	class Behavior {
 		String description;
 		boolean hasDuration;
