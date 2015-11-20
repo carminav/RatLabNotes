@@ -30,6 +30,16 @@ public class Behaviors {
 		return behaviors.size();
 	}
 	
+	public void print() {
+		System.out.println("-----------------------");
+		for (Integer keyCode : behaviors.keySet()) {
+			Behavior b = behaviors.get(keyCode);
+			String str = String.format("%d => [%s, hasDuration: %s]",keyCode, b.description, b.hasDuration);
+			System.out.println(str);
+		}
+		System.out.println("-----------------------");
+	}
+	
 	class Behavior {
 		String description;
 		boolean hasDuration;
