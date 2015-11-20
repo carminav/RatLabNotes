@@ -8,6 +8,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
@@ -85,7 +88,7 @@ public class Program implements KeyEventDispatcher {
         mediaPlayer = videoSurface.getMediaPlayer();
         mediaPlayerComponent = videoSurface.getMediaPlayerComponent();
         
-        controlPanel = new ControlPanel(mediaPlayerComponent, config.getControlPanelSize());
+        controlPanel = new ControlPanel(mediaPlayerComponent, config.getControlPanelSize(), this);
         
         KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         manager.addKeyEventDispatcher(this);
@@ -214,6 +217,63 @@ public class Program implements KeyEventDispatcher {
 		}
 	} 
 	
+	protected void exportToCSV() {
+		// Get output file
+		JFileChooser fileChooser = new JFileChooser();
+		String outFile = "";
+		/* TODO: remove hardcoding of directories */
+		/* TODO: make file end in .csv extension */
+    	fileChooser.setCurrentDirectory(new File("C:\\Users\\Carmina\\Videos"));
+    	int result = fileChooser.showOpenDialog(frame);
+    	if (result == JFileChooser.APPROVE_OPTION) {
+    	    File selectedFile = fileChooser.getSelectedFile();
+    	    outFile = selectedFile.getAbsolutePath();
+    	}
+    	
+    	System.out.println("out file : " + outFile);
+    	
+    	// open file for writing
+    	File f = new File(outFile);
+    	
+    	boolean exists = false;
+
+    	PrintWriter out = null;
+    	if ( f.exists() && !f.isDirectory()) {
+    	    try {
+				out = new PrintWriter(new FileOutputStream(new File(outFile), true));
+			} catch (FileNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+    	    exists = true;
+    	}
+    	else {
+    	    try {
+				out = new PrintWriter(outFile);
+				// print headers
+				out.println("Key,Start,End,Behavior,Duration");
+				
+			} catch (FileNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+    	}
+    	
+    	// write to out file
+    	for (BehaviorEvent e : events) {
+    		String str = String.format("%s,%s,%s,%s,%s\n", e.key, time(e.start), 
+    									time(e.end), e.description, time(e.dur));
+    		if (exists) {
+    			out.append(str);
+    		} else {
+    			out.print(str);
+    		}
+    	}
+    	
+    	out.close();
+		
+	}
+	
 	private String time(long millis) {
 		return String.format("%02d:%02d:%02d",
 				TimeUnit.MILLISECONDS.toHours(millis),
@@ -250,6 +310,7 @@ public class Program implements KeyEventDispatcher {
 			boolean tmp = ignoreKeys;
 			ignoreKeys = true;
 			JFileChooser fileChooser = new JFileChooser();
+			/* TODO: remove hardcoding of directories */
 	    	fileChooser.setCurrentDirectory(new File("C:\\Users\\Carmina\\Videos"));
 	    	int result = fileChooser.showOpenDialog(frame);
 	    	if (result == JFileChooser.APPROVE_OPTION) {

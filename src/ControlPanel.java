@@ -52,9 +52,12 @@ public class ControlPanel extends JPanel {
 	
 	private boolean pausePlaySelected = false;
 	
+	private Program prog;
 	
-	public ControlPanel(DirectMediaPlayerComponent mpc, Dimension size) {
+	
+	public ControlPanel(DirectMediaPlayerComponent mpc, Dimension size, Program prog) {
 		this.size = size;
+		this.prog = prog;
 		
 		setBackground(Color.black);
 		setSize(size);
@@ -151,6 +154,15 @@ public class ControlPanel extends JPanel {
 		
 		saveBtn = new JButton("Save");
 		saveBtn.setPreferredSize(new Dimension((int) (size.width * 0.1), size.height / 5));
+		saveBtn.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				prog.exportToCSV();
+			}
+			
+		});
+		
 		
 		bottomPanel.add(speed);
 		bottomPanel.add(saveBtn);
