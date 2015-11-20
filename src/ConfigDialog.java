@@ -83,7 +83,7 @@ public class ConfigDialog extends JDialog {
 		mainPane.add(btnPanel);
 		
 		getContentPane().add(mainPane);
-		setVisible(true);
+		
 	}
 	
 	public Behaviors getBehaviorConfig() {

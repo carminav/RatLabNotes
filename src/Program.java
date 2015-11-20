@@ -34,6 +34,8 @@ public class Program implements KeyEventDispatcher {
     
     private Behaviors behaviors;
     
+    private ConfigDialog configDialog;
+    
     private ControlPanel controlPanel;
     
     
@@ -80,6 +82,8 @@ public class Program implements KeyEventDispatcher {
         
         setupMenu();
         
+        configDialog = new ConfigDialog(frame);
+        
         frame.add(leftPanel);
         frame.add(liveFeedPanel);
         frame.setVisible(true);
@@ -101,8 +105,8 @@ public class Program implements KeyEventDispatcher {
     	configI.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ConfigDialog configPanel = new ConfigDialog(frame);
-				Behaviors b = configPanel.getBehaviorConfig();
+				configDialog.setVisible(true);
+				Behaviors b = configDialog.getBehaviorConfig();
 				if (b != null) {
 					behaviors = b;
 				}
