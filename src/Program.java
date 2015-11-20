@@ -39,6 +39,7 @@ public class Program implements KeyEventDispatcher {
     
     private ControlPanel controlPanel;
     
+    private boolean ignoreKeys;
     
     private String mediaPath = null;
 
@@ -60,6 +61,8 @@ public class Program implements KeyEventDispatcher {
             }
         });
         
+        ignoreKeys = true;
+        
         behaviors = new Behaviors();
         
         leftPanel = new JPanel();
@@ -69,7 +72,6 @@ public class Program implements KeyEventDispatcher {
         videoSurface = new VideoSurface(config.getVideoSize());
         liveFeedPanel = new LiveFeedPanel(config.getLiveFeedSize());
            
-        /* play media */
         mediaPlayer = videoSurface.getMediaPlayer();
         mediaPlayerComponent = videoSurface.getMediaPlayerComponent();
         
@@ -106,6 +108,7 @@ public class Program implements KeyEventDispatcher {
     	configI.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				ignoreKeys = true;
 				configDialog.setVisible(true);
 			}
     	});
@@ -134,12 +137,13 @@ public class Program implements KeyEventDispatcher {
     protected void updateBehaviors(Behaviors b) {
     	behaviors = b;
     	System.out.println("size of b: " + b.size());
-    	
+    	ignoreKeys = false;
     }
     
 	@Override
 	public boolean dispatchKeyEvent(KeyEvent e) {
 		
+		if (ignoreKeys) return false;
 		
 		if (e.getID() == KeyEvent.KEY_PRESSED) {
 			
@@ -154,15 +158,16 @@ public class Program implements KeyEventDispatcher {
 				processConfigKeys(e);
 			}
 			
-			
 		}
 			
 		return false;
 	}
 	
 	private void processConfigKeys(KeyEvent e) {
+		System.out.println("code: " + e.getKeyCode());
+		behaviors.print();
+		
 		if (e.getID() == KeyEvent.KEY_PRESSED && behaviors.hasBehavior(e.getKeyCode())) {
-			System.out.println("should printttt");
 			String desc = behaviors.getDescription(e.getKeyCode());
 			boolean hasDur = behaviors.getHasDuration(e.getKeyCode());
 			long start = mediaPlayerComponent.getMediaPlayer().getTime();
@@ -170,8 +175,6 @@ public class Program implements KeyEventDispatcher {
 			
 			liveFeedPanel.printLiveEvent(e.getKeyChar(), new Timestamp(start), 
 											new Timestamp(end), desc);
-		} else {
-			System.out.println("wtf");
 		}
 	} 
     
@@ -179,6 +182,8 @@ public class Program implements KeyEventDispatcher {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			boolean tmp = ignoreKeys;
+			ignoreKeys = true;
 			JFileChooser fileChooser = new JFileChooser();
 	    	fileChooser.setCurrentDirectory(new File("C:\\Users\\Carmina\\Videos"));
 	    	int result = fileChooser.showOpenDialog(frame);
@@ -193,7 +198,7 @@ public class Program implements KeyEventDispatcher {
 	                "Rat Lab Notes - %s",
 	                mediaPlayerComponent.getMediaPlayer().getMediaMeta().getTitle()
 	        ));
-	    	
+	    	ignoreKeys = tmp;
 		}
     	
     }
