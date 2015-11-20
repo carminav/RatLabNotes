@@ -26,13 +26,16 @@ public class ConfigDialog extends JDialog {
 	
 	private boolean updated;
 	
+	private Program prog;
 	
-	public ConfigDialog(JFrame parent) {
+	public ConfigDialog(JFrame parent, Program prog) {
 		super(parent, "Configure Hotkeys");
 		setLocation(500,500);
 		setSize(800, 600);
 		
 		mainPane = new JPanel();
+		
+		this.prog = prog;
 		
 		updated = false;
 		
@@ -70,7 +73,24 @@ public class ConfigDialog extends JDialog {
 		applyBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				updated = true;
+				
+				Behaviors b = new Behaviors();
+				
+				for (int i = 0; i < rows.size(); i++) {
+					ConfigRow row = rows.get(i);
+					String key = row.keyText.getText();
+					String desc = row.descText.getText();
+					boolean hasDur = row.hasDuration.isSelected();
+					
+					if (!key.isEmpty() && !desc.isEmpty()) {
+						int keyStroke = AWTKeyStroke.getAWTKeyStroke(key.charAt(0)).getKeyCode();
+						System.out.println("add " + desc);
+						b.addBehavior(keyStroke, desc, hasDur);
+					}	
+				}
+				
+				prog.updateBehaviors(b);
+				setVisible(false);
 			}
 		});
 		
@@ -86,27 +106,6 @@ public class ConfigDialog extends JDialog {
 		
 	}
 	
-	public Behaviors getBehaviorConfig() {
-		if (updated) {
-			
-			Behaviors b = new Behaviors();
-			
-			for (int i = 0; i < rows.size(); i++) {
-				ConfigRow row = rows.get(i);
-				String key = row.keyText.getText();
-				String desc = row.descText.getText();
-				boolean hasDur = row.hasDuration.isSelected();
-				
-				if (!key.isEmpty() && !desc.isEmpty()) {
-					int keyStroke = AWTKeyStroke.getAWTKeyStroke(key.charAt(0)).getKeyCode();
-					b.addBehavior(keyStroke, desc, hasDur);
-				}	
-			}
-			
-			return b;
-			
-		} else return null;
-	}
 	
 	private void addRow() {
 		
